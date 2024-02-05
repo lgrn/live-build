@@ -1,0 +1,12 @@
+gnome-core
+firefox-esr
+cryptsetup-initramfs
+firmware-iwlwifi
+firmware-ath9k-htc
+atmel-firmware
+firmware-atheros
+firmware-brcm80211
+firmware-ipw2x00
+firmware-libertas
+firmware-zd1211
+
