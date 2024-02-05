@@ -35,7 +35,9 @@ When done, you'll have an .iso file.
 
 ### Test ISO file with KVM/QEMU
 
-TODO
+```bash
+qemu-system-x86_64 -boot d -cdrom live-image-amd64.hybrid.iso -m 4096 -accel kvm
+```
 
 ### Write ISO to USB stick with encrypted persistence
 
