@@ -1,12 +1,28 @@
-gnome-core
-firefox-esr
-cryptsetup-initramfs
-firmware-iwlwifi
-firmware-ath9k-htc
-atmel-firmware
-firmware-atheros
-firmware-brcm80211
-firmware-ipw2x00
-firmware-libertas
-firmware-zd1211
+# desktop environment, alternates include 'xfce4' (tested),
+# i3 (not tested) and sway (not tested)
 
+gnome-core
+
+# likely a dependency, but include it anyway for clarity
+firefox-esr
+
+# required to decrypt LUKS persistence
+cryptsetup-initramfs
+
+# support for Intel 802.11n devices (wifi)
+firmware-iwlwifi
+
+# instead of installing firmware, we could rely on this meta-package,
+# but it's currently purged in remove_packages.hook
+# live-task-non-free-firmware-pc
+
+# firmware packages that may be needed, but not
+# included by default to conserve space 
+#
+# firmware-ath9k-htc
+# atmel-firmware
+# firmware-atheros
+# firmware-brcm80211
+# firmware-ipw2x00
+# firmware-libertas
+# firmware-zd1211
