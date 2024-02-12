@@ -1,0 +1,26 @@
+#!/bin/sh
+
+set -e
+
+for PACKAGE in aptitude info wget totem firmware-netronome firmware-qcom-soc firmware-atheros firmware-libertas pocketsphinx-en-us raspi-firmware ibus-data firmware-amd-graphics firmware-nvidia-tesla-gsp mesa-vulkan-drivers gstreamer1.0-plugins-bad gnome-sushi gnome-software gnome-online-accounts gnome-accessibility-themes live-task-non-free-firmware-server live-task-non-free-firmware-pc
+do
+        if ! apt-get remove --purge --yes "${PACKAGE}"
+        then
+                echo "WARNING: ${PACKAGE} isn't installed"
+        else
+                echo "OK: ${PACKAGE} purged"
+        fi
+done
+
+apt-get autoremove --yes || true
+
+# Removing unused files
+find . -name *~ -print0 | xargs -0 rm -f
+
+rm -rf /var/cache/man/*
+
+# Truncating logs
+for FILE in $(find /var/log/ -type f)
+do
+        : > ${FILE}
+done

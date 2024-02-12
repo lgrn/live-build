@@ -3,10 +3,41 @@
 set -e
 
 lb config noauto \
-     --distribution bookworm \
-     --archive-areas "main contrib non-free non-free-firmware" \
-     --bootappend-live "boot=live toram=filesystem.squashfs components locales=en_US.UTF-8 hostname=bahnhof username=hackerman user-fullname=hackerman timezone=Europe/Stockholm persistence persistence-encryption=luks persistence-media=removable-usb keyboard-layouts=se" \
-     --mirror-bootstrap http://mirror.zetup.net/debian/ \
-     --mirror-binary http://mirror.zetup.net/debian/ \
-     "${@}"
+  --distribution bookworm \
+  --archive-areas "main contrib non-free non-free-firmware" \
+  --bootappend-live "boot=live toram=filesystem.squashfs components locales=en_US.UTF-8 hostname=bahnhof username=hackerman user-fullname=hackerman timezone=Europe/Stockholm persistence persistence-encryption=luks persistence-media=removable-usb keyboard-layouts=se" \
+  --mirror-bootstrap http://mirror.zetup.net/debian/ \
+  --mirror-binary http://mirror.zetup.net/debian/ \
+  --apt-indices false \
+  "${@}"
 
+# --bootappend-live:
+#
+# toram: push entire root file system to RAM
+#
+# persistence-media: only check for persistence volumes on usb stick.
+# remove this if you want persistence to be detected on 'normal' drives.
+#
+# --apt-indices:
+#
+# false: don't include APT indices in the image. this helps conserve
+# space, but means that 'apt-get update' must be run to rebuild indices
+# before any apt-get operations can be done.
+#
+# --apt-recommends:
+#
+# false: do not install recommended packages. "The most important
+# consequence of turning off recommends is that live-boot and
+# live-config themselves recommend some packages that provide important
+# functionality used by most Live configurations."
+# 
+# Two packages which you most probably will want to add again are:
+#
+#     'user-setup' which live-config recommends is used to create the
+#     live user.
+#
+#     'sudo' which live-config recommends is used to obtain
+#     root access in the live-image, which is needed to shutdown the
+#     computer.
+#
+# (these are included via 'recommends.list.chroot' just in case)
