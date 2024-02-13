@@ -9,6 +9,7 @@ lb config noauto \
   --mirror-bootstrap http://mirror.zetup.net/debian/ \
   --mirror-binary http://mirror.zetup.net/debian/ \
   --apt-indices false \
+  --uefi-secure-boot enable \
   "${@}"
 
 # --bootappend-live:
@@ -30,7 +31,7 @@ lb config noauto \
 # consequence of turning off recommends is that live-boot and
 # live-config themselves recommend some packages that provide important
 # functionality used by most Live configurations."
-# 
+#
 # Two packages which you most probably will want to add again are:
 #
 #     'user-setup' which live-config recommends is used to create the
