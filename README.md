@@ -253,8 +253,15 @@ with only minor changes made to the following files:
 * `auto/config` to customize things like boot parameters and distro
 * `config/package-lists/my.list.chroot` to add additional packages, namely
   gnome, firefox and non-free wireless firmware packages.
-* `config/hooks/normal/` to run certain commands before creating the ISO,
-  currently just purging packages to conserve space.
+* `config/hooks/normal/` to run certain commands before creating the ISO.
+* `config/includes.chroot/` corresponds to the root of the file system,
+  use this to inject configuration files etc.
+
+> [!CAUTION]
+> **Do not** include sensitive information of any kind in
+> `includes.chroot`, the root file system of `live-build` is **not
+> encrypted**. All sensitive information must go into LUKS-encrypted
+> persistence later.
 
 ## 6 Q&A
 
