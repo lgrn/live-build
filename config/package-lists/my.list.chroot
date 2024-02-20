@@ -1,9 +1,26 @@
 # desktop environment, alternates include 'xfce4' (tested),
 # i3 (not tested) and sway (not tested)
+
+# smaller gnome
 gnome-core
+
+#xfce4
+#libxfce4ui-utils
+#thunar
+#xfce4-appfinder
+#xfce4-panel
+#xfce4-session
+#xfce4-settings
+#xfce4-terminal
+#xfconf
+#xfdesktop4
+#xfwm4
+#qt5ct
+#adwaita-qt
 
 # likely a dependency, but include it anyway for clarity
 firefox-esr
+webext-ublock-origin-firefox
 
 # required to decrypt LUKS persistence
 cryptsetup-initramfs
@@ -11,7 +28,12 @@ cryptsetup-initramfs
 # support for Intel 802.11n devices (wifi)
 firmware-iwlwifi
 
-# stuff you shouldn't have to install
+# section for "convenient" installations that are still small enough to
+# be relatively uncontroversial. larger installations should probably be
+# done in hooks/normal
+keychain
+gpg
+apt-transport-https
 curl
 tmux
 net-tools
@@ -19,6 +41,9 @@ mtr-tiny
 dnsutils
 rsync
 gdu
+jq
+git
+ripgrep
 
 # instead of installing firmware, we could rely on this meta-package,
 # but it's currently purged in remove_packages.hook
