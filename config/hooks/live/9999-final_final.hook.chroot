@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -e
+
+CUSTOM_CFG="/boot/grub/custom.cfg"
+
+if [ -f "$CUSTOM_CFG" ]; then
+    echo "source $CUSTOM_CFG" >> /boot/grub/grub.cfg
+else
+    echo "$CUSTOM_CFG does not exist, skipping..."
+fi
