@@ -61,13 +61,22 @@ rm -rf /var/cache/*
 
 for TIMER in apt-daily-upgrade apt-daily dpkg-db-backup fstrim man-db
 do
-        if ! systemctl disable ${TIMER}.timer --now
-        then
-                echo "WARNING: ${TIMER} timer wasn't disabled"
-        else
-                echo "OK: ${TIMER}.timer disabled"
-        fi
+        systemctl disable ${TIMER}.timer --now || true
 done
+
+# set dark mode and wallpaper in gnome, then compile schemas (ie apply)
+
+cat <<EOF >> /usr/share/glib-2.0/schemas/theme-override.gschema.override
+[org.gnome.desktop.interface]
+gtk-theme='Adwaita-dark'
+color-scheme='prefer-dark'
+
+[org.gnome.desktop.background]
+picture-uri='file:///usr/share/backgrounds/gnome/blobs-l.svg'
+
+EOF
+
+glib-compile-schemas /usr/share/glib-2.0/schemas/
 
 # Removing unused files
 find . -name *~ -print0 | xargs -0 rm -f
