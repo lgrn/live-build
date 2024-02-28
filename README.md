@@ -10,19 +10,20 @@ persistence.
 - Boot from that USB, physically or in VM
 - Set up an encrypted persistence partition (LUKS)
 
-## 1 `live-build`
+## 1 – Introduction
 
 `live-build` is, according to their own documentation:
 
 > A collection of scripts used to build customized live systems
 
 Always refer to the [original documentation](https://live-team.pages.debian.net/live-manual/html/live-manual/index.en.html)
-when looking for answers on how `live-build` works.
+when looking for answers on how `live-build` works. Prefix your
+googling with `site:live-team.pages.debian.net` for doc results only.
 
-> [!TIP]
-> Prefix your googling with `site:live-team.pages.debian.net` for doc results only.
+### 1.1 – Building the ISO
 
-### 1.1 Building the ISO
+If you don't want to build the ISO yourself, grab one from the releases
+section on github.
 
 > [!IMPORTANT]
 > Debian is required for this guide. Use a VM if necessary, run as root.
@@ -46,104 +47,28 @@ Trigger a build (possibly do `lb clean` first):
 lb build
 ```
 
-> [!NOTE]
-> Full output is available in `build.log`, the file is removed on every `lb clean`
+Full output is available in `build.log`, the file is removed on every
+`lb clean`
 
 Build times vary heavily, but you can expect at least 15-30 minutes. If the
-build succeeded, you should now have an ISO: `live-image-amd64.hybrid.iso`
+build succeeded, you should now have an ISO:
+`live-image-amd64.hybrid.iso`
 
-## 2 Booting ISO file with KVM/QEMU
+### 1.1 – Boot from ISO only
 
-> [!NOTE]
-> Booting the ISO without writing it to USB first may be useful for testing. If
-> you don't care, skip to section 3.
-
-### 2.1 QEMU flags
-
-- `-boot d`: boot from cdrom device
-- `-cdrom [string]`: path to ISO file, used as cdrom device
-- `-m [int]`: megabytes of memory
-- `-smp [int]`: virtual cpus
-- `-drive [string]`: takes `format=` and `file=` comma separated
-
-### 2.2 QEMU ISO boot
+If you wish the test the ISO without persistence, you can easily boot
+from it:
 
 ```bash
-qemu-system-x86_64 -boot d -cdrom live-image-amd64.hybrid.iso \
--m 4096 -smp 4 -accel kvm
+qemu-system-x86_64 -cdrom live-image-amd64.hybrid.iso \
+-m 4096 -smp 6 -accel kvm -cpu host
 ```
 
-### 2.3 Persistent QCOW file in QEMU (for testing)
-
-> [!NOTE]
-> **This is only for testing purposes**, it is not part of setting up USB
->persistence. There's currently no tested and working way to write existing
-> QCOW persistence to the USB that I know of. If you've tested something and it
-> works, let me know!
-
-```bash
-qemu-img create -f qcow2 persistence.qcow2 2G
-```
-
-Now let's set up the QCOW as an encrypted persistence partition. As root:
-
-```bash
-# load nbd kernel module
-modprobe nbd max_part=4
-
-# attach the device
-qemu-nbd --connect=/dev/nbd0 persistence.qcow2
-
-# encrypt, open, format and label device
-cryptsetup --verbose --verify-passphrase luksFormat /dev/nbd0
-
-# optionally, verify the device
-cryptsetup luksDump /dev/nbd0 | head
-LUKS header information
-(...)
-
-# open, format and label
-cryptsetup luksOpen /dev/nbd0 qcow
-mkfs.ext4 -L persistence /dev/mapper/qcow
-e2label /dev/mapper/qcow persistence
-
-# mount to place persistence.conf
-mkdir -p /mnt/qcow
-mount /dev/mapper/qcow /mnt/qcow
-echo "/ union" | tee /mnt/qcow/persistence.conf
-
-# unmount and close
-umount /dev/mapper/qcow
-cryptsetup luksClose /dev/mapper/qcow
-
-# if you want to use /dev/nbd0 in a VM (below),
-# you need to disconnect it first.
-qemu-nbd --disconnect /dev/nbd0
-```
-
-> [!NOTE]
-> When attaching the persistence QCOW with `-drive`, remember to temporarily
-> remove `persistence-media=removable-usb` from the boot options, if present,
-> as this disk will not show up as a removable USB device.
-
-```bash
-qemu-system-x86_64 -boot d -cdrom live-image-amd64.hybrid.iso \
--m 4096 -smp 4 -accel kvm \
--drive format=qcow2,file=persistence.qcow2
-```
-
-You should be asked for the passphrase on boot.
-
-This is a good time to set your environment up as you want it, then reboot the
-VM and confirm that the changes stick.
-
-When you're happy, you can move on to writing data to USB.
-
-## 3 Write ISO and persistence to USB memory stick
+## 2 – Write ISO and persistence to USB memory stick
 
 Assumptions:
 
-- You already have an ISO from section 1.
+- You already have an ISO from section 1, or downloaded from github.
 - You have a USB drive.
 
 > [!CAUTION]
@@ -170,20 +95,7 @@ If you want to manually decide how large the partition should be, you must run
 
 In almost all cases, this new partition will be `sdX3`.
 
-### 3.1 Create encrypted persistence
-
-> [!NOTE]
-> It's not strictly necessary to do this from within the VM, but it's both
-> safer and more convenient to be able to test the persistence without having
-> to yank the USB stick between machines.
-
-Start a VM using your physical USB as disk:
-
-```bash
-qemu-system-x86_64 -m 4096 -smp 4 -accel kvm -hdb /dev/sdX
-```
-
-It will boot without persistence, let's set it up. As root:
+### 2.1 – Create encrypted persistence
 
 ```bash
 # encrypt, open, format and label device
@@ -198,12 +110,13 @@ mount /dev/mapper/usb /mnt/usb
 
 # choose your kind of persistence:
 
-# 1. everything! (may save unnecessary stuff like cache to encrypted storage)
+# 1. everything!
+# (may save unnecessary stuff like cache to encrypted storage)
 # NOTE: /var/cache can be especially bad
 echo "/ union" | tee /mnt/usb/persistence.conf
 
-# 2. tailored: things may break, but you can add more folders later
-# if you lack copy-paste, you can also just 'nano' this file
+# 2. tailored:
+# things may break, but you can add more folders later
 tee /mnt/usb/persistence.conf <<EOF
 /home union
 /etc union
@@ -216,20 +129,68 @@ umount /dev/mapper/usb
 cryptsetup luksClose /dev/mapper/usb
 ```
 
-> [!NOTE]
-> Consider pros and cons: `/ union` in `persistence.conf` means that everything
-> is persistent, while `/home union`would mean everything is discarded except
-> changes in `/home`. These have different and obvious implications for IO
-> traffic. In these instructions, only `/home` and `/etc` persist.
+Done.
 
-The USB is now ready to go. You can now either:
+Consider pros and cons: `/ union` in `persistence.conf` means that
+everything is persistent, while `/home union`would mean everything is
+discarded except changes in `/home`. These have different and obvious
+implications for IO traffic. In these instructions, only `/home` and
+`/etc` persist.
 
-1. Simply reboot the VM. In this case, remember to remove
-   `persistence-media=removable-usb` from the boot options, as the VM will not
-   correctly identify that this is a USB device.
-2. Power-off and insert the USB in another PC.
+The USB is ready to go. You can now either:
 
-## 4 Technical description, or why it works
+1. Reboot from the USB physically.
+1. As below, boot a VM from the USB device.
+
+## 3 – Booting ISO file with KVM/QEMU
+
+To save some time, you may want to interface directly with the USB
+stick through QEMU rather than having to physically reboot multiple
+times.
+
+### 3.1 – QEMU flags explained
+
+- `-boot d`: boot from cdrom device
+- `-cdrom [string]`: path to ISO file, used as cdrom device
+- `-m [int]`: megabytes of memory
+- `-smp [int]`: virtual cpus
+- `-drive [string]`: takes `format=` and `file=` comma separated
+
+### 3.2 – QEMU USB boot
+
+```bash
+qemu-system-x86_64 -drive file=/dev/sda,format=raw,media=disk \
+-m 4096 -smp 6 -accel kvm -cpu host
+```
+
+> [!IMPORTANT]
+> In a virtual environment, the disk will not be recognized as a USB
+> thumbdrive. You **must** therefore modify the boot parameters and
+> remove `persistence-media=removable-usb`.
+
+After unlocking the LUKS encrypted partition on boot, you are free to
+customize your environment before backing up your persistence.
+
+## 4 – Backup
+
+When you are happy with the state of your environment, it's probably a
+good idea to back it up. The easiest way that I've found of doing this
+is to simply allow your regular Linux environment to unlock and mount
+the encrypted partition.
+
+In most desktop environments, you'll be prompted to decrypt it as soon
+as your USB is inserted. After it's unlocked, you can usually find it
+at something like `/media/your_user/persistence`, and since this
+appears like any regular mounted ext4 partition, you can back it up
+however you see fit, for example with [restic](https://restic.net/)
+
+## 4.1 – Restoring from backup
+
+If you have created a new USB stick with an encrypted but empty
+persistence partition, you simply need to unlock it, mount it and move
+the files over from your backup.
+
+## 5 – Technical description, or why it works
 
 Because of kernel boot options set in `auto/config`, the ISO image will by
 default look for encrypted LUKS partitions on the USB stick and attempt to
@@ -244,7 +205,7 @@ If you wish to change these values permanently, they must be changed in
 `auto/config` before building. They can also be changed temporarily on each
 boot.
 
-## 5 Postscript
+## 6 – Postscript
 
 This repo is based on
 [images/standard](https://salsa.debian.org/live-team/live-images/-/tree/debian/images/standard?ref_type=heads)
@@ -262,11 +223,3 @@ with only minor changes made to the following files:
 > `includes.chroot`, the root file system of `live-build` is **not
 > encrypted**. All sensitive information must go into LUKS-encrypted
 > persistence later.
-
-## 6 Q&A
-
-### How do I back up my persistence?
-
-In many Linux desktop environments, the prompt to unlock the encrypted
-persistence will come up automatically when you plug in the USB. Simply decrypt
-it and back up the unencrypted data in whatever way you prefer.
