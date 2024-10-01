@@ -134,8 +134,7 @@ Done.
 Consider pros and cons: `/ union` in `persistence.conf` means that
 everything is persistent, while `/home union`would mean everything is
 discarded except changes in `/home`. These have different and obvious
-implications for IO traffic. In these instructions, only `/home` and
-`/etc` persist.
+implications for IO traffic.
 
 The USB is ready to go. You can now either:
 
@@ -150,11 +149,11 @@ times.
 
 ### 3.1 – QEMU flags explained
 
-- `-boot d`: boot from cdrom device
-- `-cdrom [string]`: path to ISO file, used as cdrom device
+- `-boot d`: boot from cdrom device (not used)
+- `-cdrom [string]`: path to ISO file, used as cdrom device (not used)
 - `-m [int]`: megabytes of memory
 - `-smp [int]`: virtual cpus
-- `-drive [string]`: takes `format=` and `file=` comma separated
+- `-drive [string]`: use this as primary disk
 
 ### 3.2 – QEMU USB boot
 
