@@ -32,6 +32,7 @@ firmware-iwlwifi
 # be relatively uncontroversial. larger installations should probably be
 # done in hooks/normal
 zstd
+grep-dctrl
 efibootmgr
 keychain
 gpg

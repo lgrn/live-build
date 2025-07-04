@@ -6,7 +6,7 @@ set -e
 
 for PACKAGE in aptitude info totem firmware-netronome firmware-qcom-soc \
 firmware-atheros firmware-libertas pocketsphinx-en-us raspi-firmware \
-ibus-data firmware-amd-graphics firmware-nvidia-tesla-gsp \
+ibus-data firmware-amd-graphics \
 mesa-vulkan-drivers gstreamer1.0-plugins-bad gnome-sushi \
 gnome-software gnome-online-accounts gnome-accessibility-themes \
 gnome-games gnome-user-docs \
@@ -45,13 +45,11 @@ echo "bookworm:live" | sudo chpasswd
 
 rm -rf /usr/share/help
 rm -rf /usr/share/doc
-rm -rf /usr/share/locale
 rm -rf /var/lib/apt
 rm -rf /var/cache/*
 
 for d in /usr/share/locale/*; do
-  # if $d is NOT the "en" directory
-  if [ "$d" != "/usr/share/locale/en" ]; then
+  if [ "$d" != "/usr/share/locale/en" ] && [ "$d" != "/usr/share/locale/se" ]; then
     echo "Removing $d"
     rm -rf -- "$d"
   fi
