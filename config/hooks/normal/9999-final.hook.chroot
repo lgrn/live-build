@@ -4,7 +4,13 @@ set -e
 
 # remove some packages to conserve space
 
-for PACKAGE in aptitude info totem firmware-netronome firmware-qcom-soc firmware-atheros firmware-libertas pocketsphinx-en-us raspi-firmware ibus-data firmware-amd-graphics firmware-nvidia-tesla-gsp mesa-vulkan-drivers gstreamer1.0-plugins-bad gnome-sushi gnome-software gnome-online-accounts gnome-accessibility-themes live-task-non-free-firmware-server live-task-non-free-firmware-pc exim4-base nvidia-kernel-common
+for PACKAGE in aptitude info totem firmware-netronome firmware-qcom-soc \
+firmware-atheros firmware-libertas pocketsphinx-en-us raspi-firmware \
+ibus-data firmware-amd-graphics firmware-nvidia-tesla-gsp \
+mesa-vulkan-drivers gstreamer1.0-plugins-bad gnome-sushi \
+gnome-software gnome-online-accounts gnome-accessibility-themes gnome-games \
+live-task-non-free-firmware-server live-task-non-free-firmware-pc \
+exim4-base
 do
         if ! apt-get remove --purge --yes "${PACKAGE}"
         then
@@ -23,31 +29,16 @@ apt-get autoremove --yes || true
 # BEGIN NICE-TO-HAVE #
 ######################
 
-# begin vscode pre-install
-
-wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
-sudo install -D -o root -g root -m 644 packages.microsoft.gpg /etc/apt/keyrings/packages.microsoft.gpg
-sudo sh -c 'echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list'
-rm -f packages.microsoft.gpg
-
-# begin fish pre-install
-
-echo 'deb http://download.opensuse.org/repositories/shells:/fish:/release:/3/Debian_12/ /' | sudo tee /etc/apt/sources.list.d/shells:fish:release:3.list
-curl -fsSL https://download.opensuse.org/repositories/shells:fish:release:3/Debian_12/Release.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/shells_fish_release_3.gpg > /dev/null
-
-# install step for all above (note packages)
-sudo apt-get update && sudo apt-get install --yes "code" "fish"
-
 # atuin install
 bash <(curl --proto '=https' --tlsv1.2 -sSf https://setup.atuin.sh)
-
-sudo useradd -m -s /usr/bin/fish bookworm || true
-sudo chown -Rv bookworm:bookworm /home/bookworm
-echo "bookworm:live" | sudo chpasswd
 
 ####################
 # END NICE-TO-HAVE #
 ####################
+
+sudo useradd -m -s /usr/bin/bash bookworm || true
+sudo chown -Rv bookworm:bookworm /home/bookworm
+echo "bookworm:live" | sudo chpasswd
 
 # Removing assumed crap
 
@@ -57,11 +48,40 @@ rm -rf /usr/share/locale
 rm -rf /var/lib/apt
 rm -rf /var/cache/*
 
+for d in /usr/share/locale/*; do
+  # if $d is NOT the "en" directory
+  if [ "$d" != "/usr/share/locale/en" ]; then
+    echo "Removing $d"
+    rm -rf -- "$d"
+  fi
+done
+
 # disable timers unsuitable for live environments
 
-for TIMER in apt-daily-upgrade apt-daily dpkg-db-backup fstrim man-db
-do
-        systemctl disable ${TIMER}.timer --now || true
+timers=(
+  apt-daily-upgrade
+  apt-daily
+  dpkg-db-backup
+  fstrim
+  man-db
+)
+
+UNIT_DIRS=(
+  /lib/systemd/system
+  /etc/systemd/system
+  /etc/systemd/system/*.wants
+)
+
+for t in "${timers[@]}"; do
+  for d in "${UNIT_DIRS[@]}"; do
+    # expand any globs, then remove matching .timer files or symlinks
+    for f in $d/${t}.timer*; do
+      [ -e "$f" ] && {
+        echo "Removing $f"
+        rm -rf -- "$f"
+      }
+    done
+  done
 done
 
 # set dark mode and wallpaper in gnome, then compile schemas (ie apply)

@@ -4,7 +4,8 @@ set -e
 
 lb config noauto \
   --distribution bookworm \
-  --chroot-squashfs-compression-type xz \
+  --chroot-squashfs-compression-type zstd \
+  --chroot-squashfs-compression-level 19 \
   --archive-areas "main contrib non-free non-free-firmware" \
   --bootappend-live "boot=live toram=filesystem.squashfs components locales=en_US.UTF-8 hostname=bahnhof username=bookworm user-fullname=bookworm timezone=Europe/Stockholm persistence persistence-encryption=luks persistence-media=removable-usb keyboard-layouts=se" \
   --mirror-bootstrap http://mirror.zetup.net/debian/ \
