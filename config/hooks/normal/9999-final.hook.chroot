@@ -2,11 +2,11 @@
 
 set -e
 
-# remove some packages to conserve space
+# remove packages to conserve space
 
 for PACKAGE in aptitude info totem firmware-netronome firmware-qcom-soc \
 firmware-atheros firmware-libertas pocketsphinx-en-us raspi-firmware \
-ibus-data firmware-amd-graphics \
+ibus-data firmware-amd-graphics firmware-nvidia-tesla-535-gsp \
 mesa-vulkan-drivers gstreamer1.0-plugins-bad gnome-sushi \
 gnome-software gnome-online-accounts gnome-accessibility-themes \
 gnome-games gnome-user-docs \
@@ -23,20 +23,6 @@ done
 
 apt-get autoremove --yes || true
 
-# nice-to-have packages. if you want to reduce the size of the build,
-# comment out this entire for-loop (BEGIN/END)
-
-######################
-# BEGIN NICE-TO-HAVE #
-######################
-
-# atuin install
-bash <(curl --proto '=https' --tlsv1.2 -sSf https://setup.atuin.sh)
-
-####################
-# END NICE-TO-HAVE #
-####################
-
 sudo useradd -m -s /usr/bin/bash bookworm || true
 sudo chown -Rv bookworm:bookworm /home/bookworm
 echo "bookworm:live" | sudo chpasswd
@@ -49,7 +35,7 @@ rm -rf /var/lib/apt
 rm -rf /var/cache/*
 
 for d in /usr/share/locale/*; do
-  if [ "$d" != "/usr/share/locale/en" ] && [ "$d" != "/usr/share/locale/se" ]; then
+  if [ "$d" != "/usr/share/locale/en" ] && [ "$d" != "/usr/share/locale/sv" ]; then
     echo "Removing $d"
     rm -rf -- "$d"
   fi
