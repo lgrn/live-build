@@ -8,7 +8,8 @@ for PACKAGE in aptitude info totem firmware-netronome firmware-qcom-soc \
 firmware-atheros firmware-libertas pocketsphinx-en-us raspi-firmware \
 ibus-data firmware-amd-graphics firmware-nvidia-tesla-gsp \
 mesa-vulkan-drivers gstreamer1.0-plugins-bad gnome-sushi \
-gnome-software gnome-online-accounts gnome-accessibility-themes gnome-games \
+gnome-software gnome-online-accounts gnome-accessibility-themes \
+gnome-games gnome-user-docs \
 live-task-non-free-firmware-server live-task-non-free-firmware-pc \
 exim4-base
 do
