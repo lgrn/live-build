@@ -18,6 +18,12 @@ gnome-core
 #qt5ct
 #adwaita-qt
 
+# zfs support
+zfs-dkms
+zfsutils-linux
+build-essential
+linux-headers-amd64
+
 # likely a dependency, but include it anyway for clarity
 firefox-esr
 webext-ublock-origin-firefox

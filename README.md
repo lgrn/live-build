@@ -141,7 +141,7 @@ The USB is ready to go. You can now either:
 1. Reboot from the USB physically.
 1. As below, boot a VM from the USB device.
 
-## 3 – Booting ISO file with KVM/QEMU
+## 3 – Booting USB stick with QEMU
 
 To save some time, you may want to interface directly with the USB
 stick through QEMU rather than having to physically reboot multiple
