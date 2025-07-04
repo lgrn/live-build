@@ -1,4 +1,7 @@
 live-boot
 live-config
 live-config-systemd
+keyboard-configuration
+console-setup
+console-data
 systemd-sysv
