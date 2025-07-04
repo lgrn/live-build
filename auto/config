@@ -11,6 +11,7 @@ lb config noauto \
   --mirror-bootstrap http://mirrors.glesys.net/debian/ \
   --mirror-binary http://mirrors.glesys.net/debian/ \
   --apt-indices false \
+  --apt-options "-o APT::Install-Recommends=0 -o APT::Install-Suggests=0" \
   --uefi-secure-boot enable \
   "${@}"
 
