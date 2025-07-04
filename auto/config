@@ -7,9 +7,15 @@ lb config noauto \
   --chroot-squashfs-compression-type xz \
   --archive-areas "main contrib non-free non-free-firmware" \
   --bootappend-live "boot=live toram=filesystem.squashfs components locales=en_US.UTF-8 hostname=bahnhof username=bookworm user-fullname=bookworm timezone=Europe/Stockholm persistence persistence-encryption=luks persistence-media=removable-usb keyboard-layouts=se" \
-  --mirror-bootstrap http://mirror.zetup.net/debian/ \
-  --mirror-binary http://mirror.zetup.net/debian/ \
+  --mirror-bootstrap http://mirrors.glesys.net/debian/ \
+  --mirror-binary http://mirrors.glesys.net/debian/ \
   --apt-indices false \
+  --apt-options "--yes \
+--option=Dpkg::Options::=--force-confdef \
+--option=Dpkg::Options::=--force-confold \
+--option=Dpkg::Options::=--force-unsafe-io \
+-o APT::Install-Recommends=0 \
+-o APT::Install-Suggests=0" \
   --uefi-secure-boot enable \
   "${@}"
 
