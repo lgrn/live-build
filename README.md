@@ -158,14 +158,30 @@ times.
 ### 3.2 – QEMU USB boot
 
 ```bash
-qemu-system-x86_64 -drive file=/dev/sda,format=raw,media=disk \
--m 4096 -smp 6 -accel kvm -cpu host
+sudo qemu-system-x86_64 \
+  -drive file=/dev/sdX,format=raw,media=disk \
+  -m 4096 -smp 6 -accel kvm -cpu host
 ```
 
 > [!IMPORTANT]
 > In a virtual environment, the disk will not be recognized as a USB
 > thumbdrive. You **must** therefore modify the boot parameters and
-> remove `persistence-media=removable-usb`.
+> remove `persistence-media=removable-usb`, or ensure that qemu
+> classifies the disk as USB.
+
+An alternative way of booting (not tested) that tells qemu the drive
+is a USB stick, avoiding the need to change the boot param above.
+Note `readonly=off` for this example, you may want to change it to
+`on` if you are testing a stick without persistence:
+
+```bash
+sudo qemu-system-x86_64 \
+  -enable-kvm -m 2G -machine q35 \
+  -device qemu-xhci,id=xhci \
+  -drive id=usbstick,if=none,format=raw,file=/dev/sdX,readonly=off \
+  -device usb-storage,bus=xhci.0,drive=usbstick \
+  -boot menu=on
+```
 
 After unlocking the LUKS encrypted partition on boot, you are free to
 customize your environment before backing up your persistence.
