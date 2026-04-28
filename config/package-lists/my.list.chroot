@@ -2,37 +2,22 @@
 # i3 (not tested) and sway (not tested)
 
 # smaller gnome
-gnome-core
+# gnome-core
 
-#xfce4
-#libxfce4ui-utils
-#thunar
-#xfce4-appfinder
-#xfce4-panel
-#xfce4-session
-#xfce4-settings
-#xfce4-terminal
-#xfconf
-#xfdesktop4
-#xfwm4
-#qt5ct
-#adwaita-qt
+task-xfce-desktop
 
 # zfs support
-zfs-dkms
-zfsutils-linux
-build-essential
-linux-headers-amd64
+#zfs-dkms
+#zfsutils-linux
+#build-essential
+#linux-headers-amd64
 
-# likely a dependency, but include it anyway for clarity
+# Firefox is 260 MB+, if you don't need a browser it can be commented out
 firefox-esr
 webext-ublock-origin-firefox
 
 # required to decrypt LUKS persistence
 cryptsetup-initramfs
-
-# support for Intel 802.11n devices (wifi)
-firmware-iwlwifi
 
 # section for "convenient" installations that are still small enough to
 # be relatively uncontroversial. larger installations should probably be
@@ -54,17 +39,45 @@ jq
 git
 ripgrep
 
-# instead of installing firmware, we could rely on this meta-package,
-# but it's currently purged in remove_packages.hook
-# live-task-non-free-firmware-pc
+# meta-package for drivers
 
-# firmware packages that may be needed, but not
+live-task-non-free-firmware-pc
+
+# the above package recommends, and therefore installs, the following:
+# rec: amd64-microcode
+#     Platform firmware and microcode for AMD CPUs and SoCs
+# rec: bluez-firmware
+#     Firmware for Bluetooth devices
+# rec: firmware-amd-graphics
+#     Binary firmware for AMD/ATI graphics and NPU chips
+# rec: firmware-atheros
+#     Binary firmware for Qualcomm Atheros wireless cards
+# rec: firmware-brcm80211
+#     Binary firmware for Broadcom/Cypress 802.11 wireless cards
+# rec: firmware-intel-sound
+#     Binary firmware for Intel sound DSPs
+# rec: firmware-ipw2x00
+#     Binary firmware for Intel Pro Wireless 2100, 2200 and 2915
+# rec: firmware-iwlwifi
+#     Binary firmware for Intel Wireless cards
+# rec: firmware-linux
+#     Binary firmware for various drivers in the Linux kernel (metapackage)
+# rec: firmware-linux-nonfree
+#     Binary firmware for various drivers in the Linux kernel (metapackage)
+# rec: firmware-realtek
+#     Binary firmware for Realtek network and audio chips
+# rec: firmware-sof-signed
+#     Intel SOF firmware - signed
+# rec: intel-microcode
+#     Processor microcode firmware for Intel CPUs
+
+# other firmware packages that may be needed, but not
 # included by default to conserve space
 #
 # firmware-ath9k-htc
 # atmel-firmware
-# firmware-atheros
-# firmware-brcm80211
-# firmware-ipw2x00
 # firmware-libertas
 # firmware-zd1211
+
+# NOTE: 9999-final.hook.chroot may remove firmware selected above,
+

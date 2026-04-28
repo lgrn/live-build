@@ -1,12 +1,12 @@
 label live-@FLAVOUR@
-	menu label ^Debian Bookworm Live (@FLAVOUR@)
+	menu label ^Debian Trixie Live (@FLAVOUR@)
 	menu default
 	linux @LINUX@
 	initrd @INITRD@
 	append @APPEND_LIVE@
 
 label live-@FLAVOUR@-failsafe
-	menu label ^Debian Bookworm Live (@FLAVOUR@ failsafe)
+	menu label ^Debian Trixie Live (@FLAVOUR@ failsafe)
 	linux @LINUX@
 	initrd @INITRD@
 	append @APPEND_LIVE_FAILSAFE@

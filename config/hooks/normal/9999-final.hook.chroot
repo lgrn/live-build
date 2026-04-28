@@ -5,13 +5,9 @@ set -e
 # remove packages to conserve space
 
 for PACKAGE in aptitude info totem firmware-netronome firmware-qcom-soc \
-firmware-atheros firmware-libertas pocketsphinx-en-us raspi-firmware \
-ibus-data firmware-amd-graphics firmware-nvidia-tesla-535-gsp \
-mesa-vulkan-drivers gstreamer1.0-plugins-bad gnome-sushi \
-gnome-software gnome-online-accounts gnome-accessibility-themes \
-gnome-games gnome-user-docs \
-live-task-non-free-firmware-server live-task-non-free-firmware-pc \
-exim4-base
+firmware-libertas firmware-marvell-prestera pocketsphinx-en-us raspi-firmware \
+ibus-data git firmware-nvidia-* \
+firmware-cavium firmware-qlogic firmware-myricom firmware-netxen dahdi-firmware-nonfree
 do
         if ! apt-get remove --purge --yes "${PACKAGE}"
         then
@@ -23,9 +19,9 @@ done
 
 apt-get autoremove --yes || true
 
-sudo useradd -m -s /usr/bin/bash bookworm || true
-sudo chown -Rv bookworm:bookworm /home/bookworm
-echo "bookworm:live" | sudo chpasswd
+sudo useradd -m -s /usr/bin/bash trixie || true
+sudo chown -Rv trixie:trixie /home/trixie
+echo "trixie:live" | sudo chpasswd
 
 # Removing assumed crap
 
@@ -71,7 +67,7 @@ done
 
 # set dark mode and wallpaper in gnome, then compile schemas (ie apply)
 
-cat <<EOF >> /usr/share/glib-2.0/schemas/theme-override.gschema.override
+cat <<EOF >> /usr/share/glib-2.0/schemas/theme-override.gschema.override || echo "Not setting dark mode, file missing" && true
 [org.gnome.desktop.interface]
 gtk-theme='Adwaita-dark'
 color-scheme='prefer-dark'
@@ -81,7 +77,7 @@ picture-uri='file:///usr/share/backgrounds/gnome/blobs-l.svg'
 
 EOF
 
-glib-compile-schemas /usr/share/glib-2.0/schemas/
+glib-compile-schemas /usr/share/glib-2.0/schemas/ || true
 
 # Removing unused files
 find . -name *~ -print0 | xargs -0 rm -f
@@ -91,3 +87,19 @@ for FILE in $(find /var/log/ -type f)
 do
         : > "${FILE}"
 done
+
+echo "*** Top20 Largest Packages ***"
+
+dpkg-query -W --showformat='${Installed-Size}\t${Package}\n' \
+  | sort -nr \
+  | head -n 20 \
+  | awk '{printf "%6.1f MB\t%s\n",$1/1024,$2}'
+
+echo ""
+echo "*** Top20 Largest FIRMWARE Packages ***"
+
+dpkg-query -W --showformat='${Installed-Size}\t${Package}\n' \
+  | grep firmware \
+  | sort -nr \
+  | head -n 20 \
+  | awk '{printf "%6.1f MB\t%s\n",$1/1024,$2}'
